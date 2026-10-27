@@ -13,7 +13,7 @@ test('admin authentication, validated uploads, public listing and deletion', asy
   const jobs = [];
   let uploads = 0;
   let cleaned = false;
-  const app = createApp({ store: { list: async () => jobs, update: async change => change(jobs) }, uploadImage: async () => { uploads++; return { secure_url: 'https://res.cloudinary.com/demo/test.webp', public_id: 'test' }; }, removeImage: async () => { cleaned = true; } });
+  const app = createApp({ store: { list: async () => jobs, add: async job => { jobs.unshift(job); return job; }, remove: async id => { const index = jobs.findIndex(job => job.id === id); return index < 0 ? null : jobs.splice(index, 1)[0]; } }, uploadImage: async () => { uploads++; return { secure_url: 'https://res.cloudinary.com/demo/test.webp', public_id: 'test' }; }, removeImage: async () => { cleaned = true; } });
   const server = app.listen(0, '127.0.0.1');
   await new Promise(resolve => server.once('listening', resolve));
   const base = `http://127.0.0.1:${server.address().port}/api`;

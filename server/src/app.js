@@ -5,9 +5,9 @@ import multer from 'multer';
 import sharp from 'sharp';
 import { randomUUID, scryptSync, timingSafeEqual } from 'node:crypto';
 import { configureCloudinary } from './cloudinary.js';
-import { createStore } from './store.js';
+import { createPostgresStore } from './postgres-store.js';
 
-export function createApp({ store = createStore(), uploadImage = cloudUpload, removeImage = cloudRemove } = {}) {
+export function createApp({ store = createPostgresStore(), uploadImage = cloudUpload, removeImage = cloudRemove } = {}) {
   const app = express();
   const production = process.env.NODE_ENV === 'production';
   if (!process.env.SESSION_SECRET || !process.env.ADMIN_PASSWORD_HASH || !process.env.ADMIN_EMAIL) {
@@ -76,15 +76,12 @@ export function createApp({ store = createStore(), uploadImage = cloudUpload, re
     try { asset = await uploadImage(buffer); }
     catch { return res.status(502).json({ message: 'Image upload failed. Please try again.' }); }
     const job = { id: randomUUID(), advertisement: asset.secure_url, advertisement_public_id: asset.public_id, apply_link: link.href, created_at: new Date().toISOString() };
-    try { await store.update(jobs => jobs.unshift(job)); }
+    try { await store.add(job); }
     catch (error) { await removeImage(asset.public_id).catch(() => {}); throw error; }
     res.status(201).json(job);
   });
   app.delete('/api/admin/jobs/:id', requireAdmin, async (req, res) => {
-    const removed = await store.update(jobs => {
-      const index = jobs.findIndex(job => String(job.id) === req.params.id);
-      return index < 0 ? null : jobs.splice(index, 1)[0];
-    });
+    const removed = await store.remove(req.params.id);
     if (!removed) return res.status(404).json({ message: 'Advertisement not found.' });
     // The listing stays removed if remote cleanup fails. Its asset ID is logged for retry.
     if (removed.advertisement_public_id) await removeImage(removed.advertisement_public_id).catch(() => console.error('Cloudinary cleanup failed for asset:', removed.advertisement_public_id));

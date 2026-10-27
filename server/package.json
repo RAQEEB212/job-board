@@ -9,7 +9,11 @@
     "cloudinary:check": "node --env-file=.env scripts/check-cloudinary.js",
     "upload:sample": "node --env-file=.env scripts/upload-sample.js",
     "test": "node --test",
-    "setup:admin": "node scripts/setup-admin.js"
+    "setup:admin": "node scripts/setup-admin.js",
+    "db:migrate": "node --env-file=.env scripts/migrate.js",
+    "db:import": "node --env-file=.env scripts/import-json.js",
+    "db:check": "node --env-file=.env scripts/check-database.js",
+    "test:database": "node --env-file=.env --test src/postgres-store.test.js"
   },
   "dependencies": {
     "cloudinary": "^2.11.0",
@@ -17,6 +21,7 @@
     "express-rate-limit": "^8.7.1",
     "express-session": "^1.19.0",
     "multer": "^2.5.0",
+    "pg": "^8.23.1",
     "sharp": "^0.35.5"
   }
 }

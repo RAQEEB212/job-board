@@ -33,6 +33,9 @@ cd server
 npm ci
 cp .env.example .env
 npm run setup:admin
+# Fill DATABASE_URL and Cloudinary values in .env
+npm run db:migrate
+npm run db:import
 npm run dev
 ```
 
@@ -50,14 +53,14 @@ The admin app supports login, Cloudinary image upload, apply links, and deletion
 4. Admin login, advertisement upload, and job management.
 5. Deployment: PostgreSQL on Neon; advertisement images on Cloudinary.
 
-PostgreSQL is not configured yet. Cloudinary integration requires credentials in server/.env.
+Advertisements are stored in Neon PostgreSQL. Cloudinary integration requires credentials in server/.env.
 Never commit `.env`, credentials, or `node_modules`.
 
 ## Public page and Cloudinary
 
 The public app fetches `/api/jobs` through the Vite development proxy. It supports loading, retry, empty states, responsive cards, and opening the full image. The initial advertisement and Apply URL are explicitly demo content.
 
-Jobs currently live in `server/data/jobs.json`; PostgreSQL is a later step. The admin app is available separately on port 5184.
+Jobs are read from and saved to PostgreSQL; `server/data/jobs.json` is the preserved legacy import source. The admin app is available separately on port 5184.
 
 Put Cloudinary values in `server/.env` (see `.env.example`), then from `server/`:
 
@@ -66,7 +69,7 @@ npm run cloudinary:check
 npm run upload:sample -- /absolute/path/to/advertisement.png
 ```
 
-The upload command uploads to Cloudinary and replaces the demo record with the returned URL and asset ID. Change its demo apply link before publishing real content. Credentials stay server-side. No unauthenticated upload endpoint is exposed.
+The upload command uploads to Cloudinary and adds a sample record in PostgreSQL with the returned URL and asset ID. Change its demo apply link before publishing real content. Credentials stay server-side. No unauthenticated upload endpoint is exposed.
 
 For deployed frontends, configure the host to proxy `/api` to the backend; the development proxy only works locally.
 
@@ -76,4 +79,20 @@ Run `npm run setup:admin` from `server/` after creating `.env` to generate the i
 
 The admin lists all advertisements and requires confirmation before deletion. Refresh the public page after publishing to see the latest ads.
 
-This is a local learning setup: jobs persist in a local JSON file and sessions are held in server memory (restart requires login). Before hosting, replace these with PostgreSQL and a persistent session store, use HTTPS, and set ADMIN_ORIGIN to the deployed admin URL. Keep the local credentials file private.
+Advertisements persist in Neon PostgreSQL; sessions are held in server memory (restart requires login). Before hosting, use a persistent session store, HTTPS, and set ADMIN_ORIGIN to the deployed admin URL. Keep the local credentials file private.
+
+## Neon PostgreSQL
+
+Project: `job-board`, AWS Singapore, database `neondb`, branch `production`.
+Only the backend reads DATABASE_URL from its ignored `.env`. Neon connections require verified TLS. Image files stay on Cloudinary.
+
+From `server/`:
+
+```sh
+npm run db:migrate      # Apply versioned schema changes; safe to repeat
+npm run db:import       # Import legacy JSON without duplicating IDs
+npm run db:check        # Check connection and advertisement count
+npm run test:database   # Verify insert, independent reconnection, read and delete
+```
+
+The API starts only after it can connect to PostgreSQL; there is no JSON fallback. Uploads and deletions use parameterized SQL. The migration/import keeps the original JSON file unchanged. The database test cleans up only its generated verification row.
