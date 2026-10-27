@@ -5,12 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "node --env-file=.env --watch src/index.js",
-    "start": "node src/index.js",
+    "start": "node --env-file=.env src/index.js",
     "cloudinary:check": "node --env-file=.env scripts/check-cloudinary.js",
-    "upload:sample": "node --env-file=.env scripts/upload-sample.js"
+    "upload:sample": "node --env-file=.env scripts/upload-sample.js",
+    "test": "node --test",
+    "setup:admin": "node scripts/setup-admin.js"
   },
   "dependencies": {
     "cloudinary": "^2.11.0",
-    "express": "latest"
+    "express": "latest",
+    "express-rate-limit": "^8.7.1",
+    "express-session": "^1.19.0",
+    "multer": "^2.5.0",
+    "sharp": "^0.35.5"
   }
 }
