@@ -8,3 +8,5 @@ dist/
 
 server/.admin-login.txt
 server/data/*.tmp
+
+.vercel/

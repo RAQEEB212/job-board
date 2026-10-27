@@ -6,6 +6,9 @@ import { createApp } from './app.js';
 
 test('admin authentication, validated uploads, public listing and deletion', async () => {
   const salt = randomBytes(16).toString('hex');
+  delete process.env.ADMIN_PASSWORD;
+  delete process.env.SESSION_STORE;
+  process.env.NODE_ENV = 'test';
   process.env.ADMIN_EMAIL = 'test@example.com';
   process.env.ADMIN_PASSWORD_HASH = `${salt}:${scryptSync('test-password', salt, 64).toString('hex')}`;
   process.env.SESSION_SECRET = randomBytes(32).toString('hex');

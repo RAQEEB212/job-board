@@ -1,0 +1,18 @@
+{
+  "name": "azaad-academy",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
+  "workspaces": [
+    "public-web",
+    "admin-web",
+    "server"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace public-web && npm run build --workspace admin-web -- --base=/admin/ && node scripts/assemble.mjs",
+    "test": "npm test --workspace job-board-server"
+  }
+}

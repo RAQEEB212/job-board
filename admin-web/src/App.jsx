@@ -43,7 +43,7 @@ export default function App() {
   async function publish(event) {
     event.preventDefault(); setError(''); setMessage('');
     const form = event.currentTarget;
-    if (!file || file.size > 5 * 1024 * 1024) { setError('Choose an image up to 5 MB.'); return; }
+    if (!file || file.size > 4 * 1024 * 1024) { setError('Choose an image up to 4 MB.'); return; }
     setBusy(true);
     try { const job = await api('/jobs', { method: 'POST', body: new FormData(form) }); setJobs(current => [job, ...current]); form.reset(); setFile(null); setMessage('Advertisement published. It is now available on the public page.'); }
     catch (error) { failure(error); } finally { setBusy(false); }
@@ -59,15 +59,15 @@ export default function App() {
     catch (error) { failure(error); } finally { setBusy(false); }
   }
   return <>
-    <header><div className="shell header"><a className="brand" href="/">Job Board <span>ADMIN</span></a>{auth && <button className="secondary" disabled={busy} onClick={logout}>Logout</button>}</div></header>
+    <header><div className="shell header"><a className="brand" href="/">Azaad Academy <span>ADMIN</span></a>{auth && <button className="secondary" disabled={busy} onClick={logout}>Logout</button>}</div></header>
     <main className="shell">
       {auth === null ? <p role="status">Checking session…</p> : !auth ? <section className="login-panel">
         <span className="eyebrow">ADMIN ACCESS</span><h1>Welcome back.</h1><p>Sign in to publish job advertisements.</p>
         <form onSubmit={login}><label htmlFor="email">Email</label><input id="email" name="email" type="email" autoComplete="username" required disabled={busy}/><label htmlFor="password">Password</label><input id="password" name="password" type="password" autoComplete="current-password" required disabled={busy}/><button disabled={busy}>{busy ? 'Signing in…' : 'Login'}</button></form>
       </section> : <>
-        <div className="page-heading"><span className="eyebrow">YOUR JOB BOARD</span><h1>Manage advertisements</h1><p>Upload an advertisement and add its application link.</p></div>
+        <div className="page-heading"><span className="eyebrow">AZAAD ACADEMY</span><h1>Manage advertisements</h1><p>Upload an advertisement and add its application link.</p></div>
         <div className="layout"><section className="panel"><h2>Post a job</h2><form onSubmit={publish}>
-          <label htmlFor="advertisement">Advertisement image</label><input id="advertisement" name="advertisement" type="file" accept="image/jpeg,image/png,image/webp" required disabled={busy} onChange={event => { setFile(event.target.files[0] || null); setError(''); }}/><small>JPG, PNG or WebP · up to 5 MB</small>
+          <label htmlFor="advertisement">Advertisement image</label><input id="advertisement" name="advertisement" type="file" accept="image/jpeg,image/png,image/webp" required disabled={busy} onChange={event => { setFile(event.target.files[0] || null); setError(''); }}/><small>JPG, PNG or WebP · up to 4 MB</small>
           {preview && <img className="upload-preview" src={preview} alt="Selected advertisement preview"/>}
           <label htmlFor="apply-link">Apply link</label><input id="apply-link" name="apply_link" type="url" placeholder="https://example.com/apply" required maxLength={2048} disabled={busy}/>
           <button disabled={busy}>{busy ? 'Please wait…' : 'Publish advertisement'}</button>

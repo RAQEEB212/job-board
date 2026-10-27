@@ -13,10 +13,12 @@
     "db:migrate": "node --env-file=.env scripts/migrate.js",
     "db:import": "node --env-file=.env scripts/import-json.js",
     "db:check": "node --env-file=.env scripts/check-database.js",
-    "test:database": "node --env-file=.env --test src/postgres-store.test.js"
+    "test:database": "node --env-file=.env --test src/postgres-store.test.js",
+    "test:production": "node --env-file=.env --test src/production-auth.test.js"
   },
   "dependencies": {
     "cloudinary": "^2.11.0",
+    "connect-pg-simple": "^10.0.0",
     "express": "latest",
     "express-rate-limit": "^8.7.1",
     "express-session": "^1.19.0",

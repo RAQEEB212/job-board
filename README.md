@@ -1,4 +1,4 @@
-# Job Board
+# Azaad Academy
 
 A learning project: one admin publishes advertisement images and application links; visitors view them and apply externally.
 
@@ -10,27 +10,24 @@ A learning project: one admin publishes advertisement images and application lin
 
 ## Requirements
 
-Node.js 22.12+ and npm. This setup was checked with Node.js 22.18.0.
+Node.js 22.12+ and npm. Vercel uses Node.js 22. Install all workspaces once with `npm ci` from the repository root.
 
 ## Run locally
 
-Open three terminals from this repository and run one block in each:
+First run `npm ci` in the repository root. Then open three terminals and run one block in each:
 
 ```sh
 cd public-web
-npm ci
 npm run dev
 ```
 
 ```sh
 cd admin-web
-npm ci
 npm run dev
 ```
 
 ```sh
 cd server
-npm ci
 cp .env.example .env
 npm run setup:admin
 # Fill DATABASE_URL and Cloudinary values in .env
@@ -58,7 +55,7 @@ Never commit `.env`, credentials, or `node_modules`.
 
 ## Public page and Cloudinary
 
-The public app fetches `/api/jobs` through the Vite development proxy. It supports loading, retry, empty states, responsive cards, and opening the full image. The initial advertisement and Apply URL are explicitly demo content.
+The public app fetches `/api/jobs` through the Vite development proxy. It supports loading, retry, empty states, responsive cards, and opening the full image. Demo records are hidden from the production public page.
 
 Jobs are read from and saved to PostgreSQL; `server/data/jobs.json` is the preserved legacy import source. The admin app is available separately on port 5184.
 
@@ -75,7 +72,7 @@ For deployed frontends, configure the host to proxy `/api` to the backend; the d
 
 ## Admin access
 
-Run `npm run setup:admin` from `server/` after creating `.env` to generate the initial account. Existing credentials are preserved on repeat runs. Local login details are in `server/.admin-login.txt` (ignored by Git). The backend stores a salted password hash in `.env`, uses an HttpOnly session cookie, limits failed login attempts, and checks allowed origins for admin mutations. Uploads require login, accept JPG/PNG/WebP up to 5 MB and 20 megapixels, and are validated and converted to WebP server-side before Cloudinary upload.
+Run `npm run setup:admin` from `server/` after creating `.env` to generate the initial account. Existing credentials are preserved on repeat runs. Local login details are in `server/.admin-login.txt` (ignored by Git). The backend stores a salted password hash in `.env`, uses an HttpOnly session cookie, limits failed login attempts, and checks allowed origins for admin mutations. Uploads require login, accept JPG/PNG/WebP up to 4 MB and 20 megapixels, and are validated and converted to WebP server-side before Cloudinary upload.
 
 The admin lists all advertisements and requires confirmation before deletion. Refresh the public page after publishing to see the latest ads.
 
@@ -96,3 +93,11 @@ npm run test:database   # Verify insert, independent reconnection, read and dele
 ```
 
 The API starts only after it can connect to PostgreSQL; there is no JSON fallback. Uploads and deletions use parameterized SQL. The migration/import keeps the original JSON file unchanged. The database test cleans up only its generated verification row.
+
+## Vercel production
+
+Deploy the repository root as one Vercel project. Source apps remain separate: public at `/`, admin at `/admin/`, backend at `/api/*`. Root `npm run build` assembles both frontend bundles. The serverless entry point is `api/[...path].js`.
+
+Set these Vercel production environment variables from the private `server/.env`: `DATABASE_URL`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `SESSION_SECRET`, `SESSION_STORE=postgres`. Set `ADMIN_ORIGIN` to the final public HTTPS origin. No secret uses a VITE_ prefix. Run database migrations before deployment. The production session cookie is Secure/HttpOnly; sessions and failed-login counts persist in PostgreSQL.
+
+The multipart upload limit is 4 MB, below Vercel's 4.5 MB function payload cap. The host must forward the original `/api/*` path to the catch-all function. Local apps still run separately on their existing ports. Vercel deployment has to be verified after connecting the account.
