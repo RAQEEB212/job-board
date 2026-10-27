@@ -1,7 +1,8 @@
 [
   {
     "id": 1,
-    "advertisement": "/sample-advertisement.svg",
+    "advertisement": "https://res.cloudinary.com/df3ok5t8p/image/upload/v1793091577/job-board/fkytgadrewhshahm5qzu.svg",
+    "advertisement_public_id": "job-board/fkytgadrewhshahm5qzu",
     "apply_link": "https://example.com/apply",
     "sample": true
   }
