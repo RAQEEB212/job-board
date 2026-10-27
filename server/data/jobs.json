@@ -1,0 +1,8 @@
+[
+  {
+    "id": 1,
+    "advertisement": "/sample-advertisement.svg",
+    "apply_link": "https://example.com/apply",
+    "sample": true
+  }
+]
