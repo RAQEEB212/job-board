@@ -14,5 +14,9 @@
   "scripts": {
     "build": "npm run build --workspace public-web && npm run build --workspace admin-web -- --base=/admin/ && node scripts/assemble.mjs",
     "test": "npm test --workspace job-board-server"
+  },
+  "optionalDependencies": {
+    "@img/sharp-libvips-linux-x64": "^1.3.4",
+    "@img/sharp-linux-x64": "^0.35.5"
   }
 }

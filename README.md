@@ -96,7 +96,7 @@ The API starts only after it can connect to PostgreSQL; there is no JSON fallbac
 
 ## Vercel production
 
-Deploy the repository root as one Vercel project. Source apps remain separate: public at `/`, admin at `/admin/`, backend at `/api/*`. Root `npm run build` assembles both frontend bundles. The serverless entry point is `api/[...path].js`.
+Deploy the repository root as one Vercel project. Source apps remain separate: public at `/`, admin at `/admin/`, backend at `/api/*`. Root `npm run build` assembles both frontend bundles. The serverless entry point is `api/index.js`.
 
 Set these Vercel production environment variables from the private `server/.env`: `DATABASE_URL`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `SESSION_SECRET`, `SESSION_STORE=postgres`. Set `ADMIN_ORIGIN` to the final public HTTPS origin. No secret uses a VITE_ prefix. Run database migrations before deployment. The production session cookie is Secure/HttpOnly; sessions and failed-login counts persist in PostgreSQL.
 
